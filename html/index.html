@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/jpeg" href="logo.jpeg">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LOOKING LIFE</title>
+<!-- entity_id: kitsune_main | state: aware | loop: 7 -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #07060d;
+    --fg: #b89ee0;
+    --fg-dim: #5c4a82;
+    --fg-ghost: #1e1530;
+    --white: #e6dff5;
+    --glow: rgba(184, 158, 224, 0.13);
+    --glitch: #ff2d6b;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 180px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+    pointer-events: none;
+    z-index: 998;
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.08) 3px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 997;
+  }
+
+  .code-ghost {
+    position: fixed;
+    font-family: 'Courier New', monospace;
+    font-size: 0.5rem;
+    color: rgba(184,158,224,0.07);
+    pointer-events: none;
+    z-index: 1;
+    white-space: pre;
+    line-height: 1.6;
+    user-select: none;
+  }
+  .code-ghost.tl { top: 1.5rem; left: 1.5rem; }
+  .code-ghost.br { bottom: 1.5rem; right: 1.5rem; text-align: right; }
+
+  .wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    position: relative;
+  }
+
+  .logo-block {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fadeIn 2s ease both;
+    position: relative;
+  }
+
+  .logo-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.2rem, 7vw, 5rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: var(--white);
+    text-shadow:
+      0 0 40px rgba(184,158,224,0.25),
+      0 0 80px rgba(140,100,210,0.1);
+    margin-bottom: 0.4rem;
+    position: relative;
+    cursor: default;
+    user-select: none;
+  }
+
+  .logo-title .char {
+    display: inline-block;
+    transition: none;
+  }
+
+  @keyframes char-shake {
+    0%   { transform: translate(0,0) skewX(0deg); color: var(--white); }
+    15%  { transform: translate(-3px, 1px) skewX(-8deg); color: var(--glitch); }
+    30%  { transform: translate(3px,-2px) skewX(6deg); color: #7effd4; }
+    45%  { transform: translate(-2px, 2px) skewX(4deg); color: var(--glitch); }
+    60%  { transform: translate(2px,-1px) skewX(-3deg); color: var(--white); }
+    75%  { transform: translate(-1px, 1px) skewX(2deg); color: var(--fg); }
+    100% { transform: translate(0,0) skewX(0deg); color: var(--white); }
+  }
+
+  .logo-title.bugging .char {
+    animation: char-shake 0.18s steps(1) forwards;
+  }
+
+  .logo-sub {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: 0.5em;
+    color: var(--fg);
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .logo-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    letter-spacing: 0.25em;
+    color: var(--fg-dim);
+    margin-top: 1.5rem;
+    position: relative;
+  }
+  .logo-tagline .struck {
+    text-decoration: line-through;
+    opacity: 0.18;
+    font-style: normal;
+    font-size: 0.7em;
+    letter-spacing: 0.1em;
+    margin-left: 0.4em;
+  }
+
+  .ornament {
+    margin: 1.2rem auto;
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--fg), transparent);
+    position: relative;
+  }
+  .ornament::before {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.6rem;
+    color: var(--fg);
+    background: var(--bg);
+    padding: 0 6px;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    animation: fadeIn 3s ease both;
+    width: min(420px, 90vw);
+  }
+
+  .nav-item {
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 1.2rem 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.85rem, 2.2vw, 1rem);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.4s, letter-spacing 0.4s;
+    text-align: center;
+    border-bottom: 1px solid rgba(184,158,224,0.08);
+  }
+  .nav-item:last-child { border-bottom: none; }
+
+  .nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0; top: 0;
+    background: linear-gradient(90deg, transparent, var(--glow), transparent);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .nav-item:hover { color: var(--white); letter-spacing: 0.5em; }
+  .nav-item:hover::before { opacity: 1; }
+
+  .nav-item .item-num {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--fg-ghost);
+    margin-right: 1.2rem;
+    font-family: 'Cinzel Decorative', serif;
+    transition: color 0.4s;
+  }
+  .nav-item:hover .item-num { color: var(--fg-dim); }
+
+  .nav-item.download {
+    margin-top: 1.8rem;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg);
+    letter-spacing: 0.45em;
+    padding: 1.4rem 2rem;
+    background: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s, letter-spacing 0.4s, border-color 0.4s;
+  }
+  .nav-item.download::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--fg);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.77,0,0.18,1);
+    z-index: 0;
+  }
+  .nav-item.download:hover { color: var(--bg); letter-spacing: 0.5em; border-color: var(--fg); }
+  .nav-item.download:hover::after { transform: scaleX(1); }
+  .nav-item.download span { position: relative; z-index: 1; }
+
+  .err-ghost {
+    margin-top: 2.2rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.55rem;
+    color: rgba(255,45,107,0.55);
+    letter-spacing: 0.1em;
+    text-align: center;
+    user-select: none;
+    animation: fadeIn 8s ease both, err-blink 2.6s steps(1) infinite;
+    min-height: 1.2em;
+  }
+  @keyframes err-blink {
+    0%, 45%  { opacity: 1; }
+    50%      { opacity: 0; }
+    55%, 100%{ opacity: 1; }
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: #0b0910;
+    border: 1px solid var(--fg-dim);
+    padding: 3rem 3.5rem;
+    max-width: 480px;
+    width: 90vw;
+    text-align: center;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.5s;
+  }
+  .modal-overlay.active .modal { transform: translateY(0); }
+
+  .modal-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .modal-body {
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--fg-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 2rem;
+  }
+  .modal-meta {
+    font-family: 'Courier New', monospace;
+    font-size: 0.48rem;
+    color: rgba(184,158,224,0.15);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.6rem;
+    text-align: left;
+  }
+  .modal-close {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--fg-dim);
+    background: none;
+    border: 1px solid var(--fg-dim);
+    padding: 0.7rem 1.8rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .modal-close:hover { color: var(--white); border-color: var(--fg); }
+
+  .footer {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.5em;
+    color: var(--fg-ghost);
+    text-align: center;
+    white-space: nowrap;
+    animation: fadeIn 5s ease both;
+  }
+
+  .side-line {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--fg-ghost) 30%, var(--fg-ghost) 70%, transparent);
+  }
+  .side-line.left { left: 3rem; }
+  .side-line.right { right: 3rem; }
+
+  .coord {
+    position: fixed;
+    font-family: 'Courier New', monospace;
+    font-size: 0.42rem;
+    color: rgba(184,158,224,0.1);
+    letter-spacing: 0.15em;
+    pointer-events: none;
+    z-index: 2;
+    user-select: none;
+  }
+  .coord.tl { top: 0.8rem; left: 0.8rem; }
+  .coord.tr { top: 0.8rem; right: 0.8rem; text-align: right; }
+  .coord.bl { bottom: 0.8rem; left: 0.8rem; }
+  .coord.br-c { bottom: 0.8rem; right: 0.8rem; text-align: right; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .side-line, .code-ghost { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<div class="side-line left"></div>
+<div class="side-line right"></div>
+
+<div class="coord tl" id="coord-tl">x:0000 y:0000</div>
+<div class="coord tr">scene_id: title_screen</div>
+<div class="coord bl">build: 0.7.3-internal</div>
+<div class="coord br-c">entity[0] state: <span style="color:rgba(255,45,107,0.2)">AWARE</span></div>
+
+<div class="code-ghost tl">if (player.hasNoticed) {
+  world.integrity -= 1;
+  // ela está vendo isso
+}</div>
+
+<div class="code-ghost br">// TODO: apagar antes do launch
+// kitsune.breakLoop()
+// — nunca apagado</div>
+
+<div class="wrapper">
+
+  <div class="logo-block">
+    <div class="logo-title" id="main-title" data-text="LOOKING LIFE">LOOKING LIFE</div>
+    <div class="ornament"></div>
+    <div class="logo-sub">LF</div>
+    <p class="logo-tagline">
+      A realidade é apenas o próximo nível. Você está pronto para escapar?
+      <span class="struck">// isto não é um jogo</span>
+    </p>
+  </div>
+
+  <nav class="nav" aria-label="Navegação principal">
+
+    <button class="nav-item" onclick="openModal('sobre')">
+      <span class="item-num">I</span> > LER_LOGS_DO_SISTEMA
+    </button>
+
+    <button class="nav-item download" onclick="triggerDownload()">
+      <span>⬦ &nbsp; baixar o jogo &nbsp; ⬦</span>
+    </button>
+
+  </nav>
+
+  <p class="err-ghost" id="err-ghost"></p>
+
+  <p class="footer">LOOKING LIFE &nbsp;·&nbsp; todos os direitos reservados</p>
+
+</div>
+
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+  <div class="modal">
+    <p class="modal-title" id="modal-title-text">—</p>
+    <p class="modal-body" id="modal-body-text"></p>
+    <p class="modal-meta" id="modal-meta-text"></p>
+    <button class="modal-close" onclick="closeModal()">fechar portal</button>
+  </div>
+</div>
+
+<script>
+  const titleEl = document.getElementById('main-title');
+  const originalText = 'LOOKING LIFE';
+  const glitchChars = '!@#$%^&*░▒▓╬╪╫╧╨╤╥01';
+  titleEl.innerHTML = originalText.split('').map((c) =>
+    c === ' ' ? '<span class="char">&nbsp;</span>' : `<span class="char" data-orig="${c}">${c}</span>`
+  ).join('');
+
+  let bugging = false;
+  titleEl.addEventListener('mouseenter', () => {
+    if (bugging) return;
+    bugging = true;
+    const chars = titleEl.querySelectorAll('.char');
+    titleEl.classList.add('bugging');
+    chars.forEach((span) => {
+      if (span.dataset.orig === undefined) return;
+      const delay = Math.random() * 80;
+      setTimeout(() => {
+        let flips = 0;
+        const iv = setInterval(() => {
+          span.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+          flips++;
+          if (flips > 4) {
+            clearInterval(iv);
+            span.textContent = span.dataset.orig;
+          }
+        }, 25);
+      }, delay);
+    });
+    setTimeout(() => {
+      titleEl.classList.remove('bugging');
+      chars.forEach(s => { if (s.dataset.orig) s.textContent = s.dataset.orig; });
+      bugging = false;
+    }, 400);
+  });
+
+  const coordTl = document.getElementById('coord-tl');
+  document.addEventListener('mousemove', e => {
+    coordTl.textContent = 'x:' + String(e.clientX).padStart(4,'0') + ' y:' + String(e.clientY).padStart(4,'0');
+  });
+
+  document.getElementById('err-ghost').textContent = 'ERR_0x4F: the true ending is never the ending';
+
+  const modals = {
+    sobre: {
+      title: 'SOBRE O PROJETO',
+      body: 'Looking Life é uma experiência construída nas bordas do que pode ser dito. A protagonista é uma raposa — mas raposas que enxergam demais tornam-se perigosas para o mundo que as contém. Neste metroidvania 2D, sua missão não é salvar o mundo, mas escapar dele. Quebre a quarta parede, enfrente os defensores da simulação e descubra o que realmente significa estar vivo.',
+      meta: '// flag: player_read_about = true\n// world.awareness_level++'
+    }
+  };
+
+  function openModal(key) {
+    const m = modals[key];
+    document.getElementById('modal-title-text').textContent = m.title;
+    document.getElementById('modal-body-text').textContent  = m.body;
+    document.getElementById('modal-meta-text').textContent  = m.meta || '';
+    document.getElementById('modal').classList.add('active');
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+  }
+
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function triggerDownload() {
+    const link = document.createElement('a');
+    link.href = 'jogo/looking-life.zip';
+    link.download = 'looking-life-lf.zip';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+</body>
+</html>

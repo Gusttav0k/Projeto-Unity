@@ -1,0 +1,6 @@
+-Looking Life- 
+
+X tá vivendo normal no mundo 2d (cima, baixo, esquerda, direita), até que ele percebe que está na verdade dentro de um jogo (como ele percebe? deu algum tipo de erro ou na verdade ele sempre meio que soube ee o jogo sempre deu sinais),
+onde tudo foi programado.
+
+Então ele começa enfrentando normalmente os inimigos que sempre enfrentou mas ele começa a nao obedecer o "caminho correto" do jogo e entao começa a ser atacado por coisas de programação como codigos e etc (desenvolver fases )
