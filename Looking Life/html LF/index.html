@@ -8,8 +8,10 @@
 <!-- entity_id: kitsune_main | state: aware | loop: 7 -->
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
 <style>
+  
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+  
   :root {
     --bg: #07060d;
     --fg: #b89ee0;
@@ -374,9 +376,27 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+.audio-toggle {
+  position: fixed;
+  bottom: 3rem;
+  right: 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.5rem;
+  color: rgba(184,158,224,0.18);
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s;
+  z-index: 5;
+}
+
+.audio-toggle:hover {
+  color: rgba(184,158,224,0.5);
+}
   @media (max-width: 600px) {
     .side-line, .code-ghost { display: none; }
   }
+  
 </style>
 </head>
 <body>
@@ -429,7 +449,13 @@
   <p class="footer">LOOKING LIFE &nbsp;·&nbsp; todos os direitos reservados</p>
 
 </div>
+<audio id="bg-music" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
 
+<div class="audio-toggle" id="audio-toggle">
+  ◈ TRANSMISSÃO: OFF
+</div>
 <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
   <div class="modal">
     <p class="modal-title" id="modal-title-text">—</p>
@@ -615,6 +641,33 @@
     link.click();
     document.body.removeChild(link);
   }
+  const music = document.getElementById('bg-music');
+const audioToggle = document.getElementById('audio-toggle');
+
+let musicEnabled = false;
+
+audioToggle.addEventListener('click', () => {
+
+  if (!musicEnabled) {
+
+    music.volume = 0.35;
+    music.play();
+
+    audioToggle.textContent = '◈ TRANSMISSÃO: ON';
+
+    musicEnabled = true;
+
+  } else {
+
+    music.pause();
+
+    audioToggle.textContent = '◈ TRANSMISSÃO: OFF';
+
+    musicEnabled = false;
+
+  }
+
+});
 </script>
 </body>
 </html>
