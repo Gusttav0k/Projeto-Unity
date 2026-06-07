@@ -443,24 +443,97 @@
   const titleEl = document.getElementById('main-title');
   const originalText = 'LOOKING LIFE';
   const glitchChars = '!@#$%^&*░▒▓╬╪╫╧╨╤╥01';
+
   titleEl.innerHTML = originalText.split('').map((c) =>
-    c === ' ' ? '<span class="char">&nbsp;</span>' : `<span class="char" data-orig="${c}">${c}</span>`
+    c === ' '
+      ? '<span class="char">&nbsp;</span>'
+      : `<span class="char" data-orig="${c}">${c}</span>`
   ).join('');
 
   let bugging = false;
+  let hoveredChar = null;
+  let continuousGlitchTimer = null;
+
+  const chars = titleEl.querySelectorAll('.char');
+
+  function glitchOneLetterConstant(span) {
+    if (!span || span.dataset.orig === undefined) return;
+
+    let flips = 0;
+
+    span.style.animation = 'char-shake 0.18s steps(1) forwards';
+
+    const iv = setInterval(() => {
+      span.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+      flips++;
+
+      if (flips > 4) {
+        clearInterval(iv);
+        span.textContent = span.dataset.orig;
+        span.style.animation = '';
+      }
+    }, 25);
+  }
+
+  function startContinuousGlitch(span) {
+    if (!span || span.dataset.orig === undefined) return;
+
+    hoveredChar = span;
+    clearInterval(continuousGlitchTimer);
+
+    // começa na hora
+    glitchOneLetterConstant(hoveredChar);
+
+    // continua bugando enquanto o mouse estiver na letra
+   continuousGlitchTimer = setInterval(() => {
+  if (hoveredChar && !bugging) {
+    glitchOneLetterConstant(hoveredChar);
+  }
+}, 2000 + Math.random() * 3000);
+  }
+
+  function stopContinuousGlitch(span) {
+    clearInterval(continuousGlitchTimer);
+    continuousGlitchTimer = null;
+
+    if (span && span.dataset.orig) {
+      span.textContent = span.dataset.orig;
+      span.style.animation = '';
+    }
+
+    hoveredChar = null;
+  }
+
+  chars.forEach(span => {
+    span.addEventListener('mouseenter', () => {
+      if (span.dataset.orig !== undefined) {
+        startContinuousGlitch(span);
+      }
+    });
+
+    span.addEventListener('mouseleave', () => {
+      stopContinuousGlitch(span);
+    });
+  });
+
   titleEl.addEventListener('mouseenter', () => {
     if (bugging) return;
+
     bugging = true;
-    const chars = titleEl.querySelectorAll('.char');
     titleEl.classList.add('bugging');
+
     chars.forEach((span) => {
       if (span.dataset.orig === undefined) return;
+
       const delay = Math.random() * 80;
+
       setTimeout(() => {
         let flips = 0;
+
         const iv = setInterval(() => {
           span.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
           flips++;
+
           if (flips > 4) {
             clearInterval(iv);
             span.textContent = span.dataset.orig;
@@ -468,11 +541,35 @@
         }, 25);
       }, delay);
     });
+
     setTimeout(() => {
       titleEl.classList.remove('bugging');
-      chars.forEach(s => { if (s.dataset.orig) s.textContent = s.dataset.orig; });
+
+      chars.forEach(s => {
+        if (s.dataset.orig) s.textContent = s.dataset.orig;
+      });
+
       bugging = false;
+
+      // se o mouse ainda estiver em cima de alguma letra, volta o glitch constante nela
+      if (hoveredChar) {
+        startContinuousGlitch(hoveredChar);
+      }
     }, 400);
+  });
+
+  titleEl.addEventListener('mouseleave', () => {
+    clearInterval(continuousGlitchTimer);
+    continuousGlitchTimer = null;
+
+    chars.forEach(s => {
+      if (s.dataset.orig) {
+        s.textContent = s.dataset.orig;
+        s.style.animation = '';
+      }
+    });
+
+    hoveredChar = null;
   });
 
   const coordTl = document.getElementById('coord-tl');
@@ -497,6 +594,7 @@
     document.getElementById('modal-meta-text').textContent  = m.meta || '';
     document.getElementById('modal').classList.add('active');
   }
+
   function closeModal() {
     document.getElementById('modal').classList.remove('active');
   }
@@ -504,6 +602,7 @@
   document.getElementById('modal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
   });
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
   });
