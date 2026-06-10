@@ -393,19 +393,59 @@
 .audio-toggle:hover {
   color: rgba(184,158,224,0.5);
 }
-  @media (max-width: 600px) {
-    .side-line, .code-ghost { display: none; }
-  }
+
+.music-credit {
+  position: fixed;
+  bottom: 1.7rem;
+  right: 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.45rem;
+  color: rgba(184,158,224,0.25);
+  letter-spacing: 0.1em;
+  z-index: 5;
+  display: none;
+} 
+
+.site-glitch {
+  animation: siteGlitch 0.15s steps(2) 8;
+}
+
+@keyframes siteGlitch {
+  0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+  25% { transform: translate(-6px, 3px); filter: hue-rotate(90deg); }
+  50% { transform: translate(5px, -4px); filter: hue-rotate(180deg); }
+  75% { transform: translate(-3px, -2px); filter: hue-rotate(270deg); }
+  100% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+}
+
+.download.error {
+  border-color: #ff2d6b;
+  color: #ff2d6b;
+  letter-spacing: 0.25em;
+}
+
   
 </style>
 </head>
 <body>
+
 
 <div class="scanlines"></div>
 
 <div class="side-line left"></div>
 <div class="side-line right"></div>
 
+<audio id="bg-music" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<div class="audio-toggle" id="audio-toggle">
+  ◈ TRANSMISSÃO: OFF
+</div>
+
+<div class="music-credit" id="music-credit">
+  Música: "The Long Dark" — Scott Buckley
+</div>
 <div class="coord tl" id="coord-tl">x:0000 y:0000</div>
 <div class="coord tr">scene_id: title_screen</div>
 <div class="coord bl">build: 0.7.3-internal</div>
@@ -438,9 +478,9 @@
       <span class="item-num">I</span> > LER_LOGS_DO_SISTEMA
     </button>
 
-    <button class="nav-item download" onclick="triggerDownload()">
-      <span>⬦ &nbsp; baixar o jogo &nbsp; ⬦</span>
-    </button>
+<button class="nav-item download" id="download-btn" onclick="fakeDownloadGlitch()">
+<span id="download-text">⬦ &nbsp; baixar o jogo &nbsp; ⬦</span>
+ </button>
 
   </nav>
 
@@ -448,13 +488,6 @@
 
   <p class="footer">LOOKING LIFE &nbsp;·&nbsp; todos os direitos reservados</p>
 
-</div>
-<audio id="bg-music" loop>
-  <source src="musica.mp3" type="audio/mpeg">
-</audio>
-
-<div class="audio-toggle" id="audio-toggle">
-  ◈ TRANSMISSÃO: OFF
 </div>
 <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
   <div class="modal">
@@ -633,16 +666,29 @@
     if (e.key === 'Escape') closeModal();
   });
 
-  function triggerDownload() {
-    const link = document.createElement('a');
-    link.href = 'jogo/looking-life.zip';
-    link.download = 'looking-life-lf.zip';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-  const music = document.getElementById('bg-music');
+  function fakeDownloadGlitch() {
+
+    alert("ERRO");
+  const btn = document.getElementById('download-btn');
+  const text = document.getElementById('download-text');
+
+  document.body.classList.add('site-glitch');
+
+  text.textContent = 'ERR_403: ACESSO_NEGADO';
+  btn.classList.add('error');
+
+  setTimeout(() => {
+    text.textContent = 'ARQUIVO_CORROMPIDO';
+  }, 900);
+
+  setTimeout(() => {
+    text.textContent = '⬦   tentar novamente   ⬦';
+    document.body.classList.remove('site-glitch');
+  }, 2200);
+}
+const music = document.getElementById('bg-music');
 const audioToggle = document.getElementById('audio-toggle');
+const musicCredit = document.getElementById('music-credit');
 
 let musicEnabled = false;
 
@@ -654,6 +700,7 @@ audioToggle.addEventListener('click', () => {
     music.play();
 
     audioToggle.textContent = '◈ TRANSMISSÃO: ON';
+    musicCredit.style.display = 'block';
 
     musicEnabled = true;
 
@@ -662,6 +709,7 @@ audioToggle.addEventListener('click', () => {
     music.pause();
 
     audioToggle.textContent = '◈ TRANSMISSÃO: OFF';
+    musicCredit.style.display = 'none';
 
     musicEnabled = false;
 
